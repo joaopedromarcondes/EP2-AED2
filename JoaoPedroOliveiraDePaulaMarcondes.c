@@ -38,6 +38,54 @@ void mostrarArvoreBMais(NO* p, int i) {
 
 }
 
+void mostrarDetalhes(NO* p) {
+    if (!p) {
+        return;
+    } 
+    printf("\n");
+    int a;
+    if (p->folha) {
+        printf("Eh folha: true\n");
+    } else {
+        printf("Eh folha: false\n");
+    }
+    
+    printf("Quantidade de nos: %d\n", p->numChaves);
+    printf("Nós: ");
+    for (a = 0; a < 2*t-1; a++) {
+        printf("%d ", p->chave[a]);
+    }
+    printf("\n");
+
+    printf("Filhos: ");
+    for (a = 0; a < 2*t; a++) {
+        if (p->filhos[a]) {
+            printf("%d ", a);
+        } 
+    }
+    printf("\n");
+
+    if (!p->folha) {
+        for (a = 0; a < 2*t; a++) {
+            mostrarDetalhes(p->filhos[a]);
+        }
+    }
+}
+
+int contarRegistros(ArvoreBMais* arv) {
+    NO* p = arv->raiz;
+
+    while (!p->folha) {
+        p = p->filhos[0];
+    }
+
+    int cont = 0;
+    while (p) {
+        cont += p->numChaves;
+        p = p->filhos[5];
+    }
+    return cont;
+}
 
 NO* criarNo() {
     NO* novo = (NO*) malloc(sizeof(NO));
@@ -52,9 +100,52 @@ NO* criarNo() {
     return novo;
 }
 
+int minimoFilhoEsquerdo(NO* p) {
+    if (p->folha) {
+        return p->chave[0];
+    }
+    return minimoFilhoEsquerdo(p->filhos[0]);
+}
+
 void split(NO* pai, NO* p, int i) {
     NO* novo = criarNo();
     novo->folha = p->folha;
+
+    if (p->folha) {
+        // arruma NO novo
+        int a;
+        for (a = t; a < 2*t-1; a++) {
+            novo->chave[a-t] = p->chave[a];
+            p->chave[a] = -1;
+            p->numChaves--;
+            novo->numChaves++;
+        }
+
+
+
+        
+        // atualiza filhos (Arvore B+)
+        if (p->folha) {
+            novo->filhos[2*t-1] = p->filhos[2*t-1];
+            p->filhos[2*t-1] = novo;
+        } 
+
+        // ajusta vertice pai
+        if (pai) {
+            for (a = pai->numChaves; a > i; a--) {
+                pai->chave[a] = pai->chave[a-1];
+                pai->filhos[a+1] = pai->filhos[a];
+            }
+            pai->filhos[i] = p;
+            pai->filhos[i+1] = novo;
+            pai->chave[i] = novo->chave[0];
+            pai->numChaves++;
+        } 
+        return;
+    }
+
+
+
 
     // arruma NO novo
     int a;
@@ -71,23 +162,20 @@ void split(NO* pai, NO* p, int i) {
     novo->filhos[t-1] = p->filhos[2*t-1];
     p->filhos[2*t-1] = NULL;
 
+    p->numChaves--;
+    p->chave[t-1] = -1;
 
-    
-    // atualiza filhos (Arvore B+)
-    if (p->folha) {
-        novo->filhos[2*t-1] = p->filhos[2*t-1];
-        p->filhos[2*t-1] = novo;
-    } 
+
 
     // ajusta vertice pai
     if (pai) {
-        for (a = pai->numChaves; a > i+1; a--) {
+        for (a = pai->numChaves; a > i; a--) {
             pai->chave[a] = pai->chave[a-1];
-            pai->filhos[a] = pai->filhos[a-1];
+            pai->filhos[a+1] = pai->filhos[a];
         }
         pai->filhos[i] = p;
         pai->filhos[i+1] = novo;
-        pai->chave[i] = novo->chave[0];
+        pai->chave[i] = minimoFilhoEsquerdo(novo);
         pai->numChaves++;
     } 
 }
@@ -97,7 +185,7 @@ void inicializarArvoreBMais(ArvoreBMais* arv) {
     arv->raiz->folha = true;
 }
 
-void insereSeNaoEstaCheio(NO* p, int registro) {
+void insereEmNoFolha(NO* p, int registro) {
 
     int pos = 0;
     while (registro > p->chave[pos] && pos < p->numChaves) {
@@ -114,19 +202,19 @@ void insereSeNaoEstaCheio(NO* p, int registro) {
 }
 
 void insereArvoreBMais(NO* p, int registro) {
+    if (p->folha) {
+        insereEmNoFolha(p, registro);
+        return;
+    }
+
     int pos = 0;
     while (registro > p->chave[pos] && pos < p->numChaves) {
         pos++;
     }
     //printf("registro: %d, pos: %d\n", registro, p->folha);
-    if (p->folha) {
-        insereSeNaoEstaCheio(p, registro);
-    } else {
-        insereArvoreBMais(p->filhos[pos], registro);
-        if (p->filhos[pos]->numChaves == 2*t-1) {
-            split(p, p->filhos[pos], pos);
-        }
-        p->chave[pos] = p->filhos[pos]->chave[0];
+    insereArvoreBMais(p->filhos[pos], registro);
+    if (p->filhos[pos]->numChaves == 2*t-1) {
+        split(p, p->filhos[pos], pos);
     }
 }
 
@@ -164,17 +252,26 @@ int main() {
     adicionarArvoreBMais(&arv, 25);
     adicionarArvoreBMais(&arv, 30);
     adicionarArvoreBMais(&arv, 9);
-    //adicionarArvoreBMais(&arv, 12);
-    //adicionarArvoreBMais(&arv, 8);
-    //adicionarArvoreBMais(&arv, 13);
-    //adicionarArvoreBMais(&arv, 23);
+    adicionarArvoreBMais(&arv, 12);
+    adicionarArvoreBMais(&arv, 8);
+    adicionarArvoreBMais(&arv, 13);
+    adicionarArvoreBMais(&arv, 23);
+    adicionarArvoreBMais(&arv, 24);
+    adicionarArvoreBMais(&arv, 13);
+    adicionarArvoreBMais(&arv, 7);
+    adicionarArvoreBMais(&arv, 16);
+    adicionarArvoreBMais(&arv, 17);
+    
 
 
     mostrarArvoreBMais(arv.raiz, 0);
     printf("\n");
+    printf("\n");
+    //mostrarDetalhes(arv.raiz);
 
+    int qnt = contarRegistros(&arv);
 
-
+    printf("A arvore tem: %d registros\n", qnt);
 
 
 
