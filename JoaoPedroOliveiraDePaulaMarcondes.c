@@ -322,54 +322,51 @@ void removerArvoreBMais(ArvoreBMais* arv, int registro) {
 
 
 int main() {
-    //printf("oi\n");
+
 
     ArvoreBMais arv;
     inicializarArvoreBMais(&arv);
 
-    mostrar(&arv);
+    FILE* entrada = fopen("entrada.txt", "r");
 
-    adicionarArvoreBMais(&arv, 30);
+    char comando;
+    int registro;
 
-    mostrar(&arv);
-
-    adicionarArvoreBMais(&arv, 9);
-    adicionarArvoreBMais(&arv, 5);
-    adicionarArvoreBMais(&arv, 8);
-    adicionarArvoreBMais(&arv, 17);
-    adicionarArvoreBMais(&arv, 26);
-
-    mostrar(&arv);
-
-    //adicionarArvoreBMais(&arv, 25);
-    //adicionarArvoreBMais(&arv, 30);
-    //adicionarArvoreBMais(&arv, 9);
-    /*adicionarArvoreBMais(&arv, 12);
-    adicionarArvoreBMais(&arv, 8);
-    adicionarArvoreBMais(&arv, 13);
-    adicionarArvoreBMais(&arv, 23);
-    adicionarArvoreBMais(&arv, 24);
-    adicionarArvoreBMais(&arv, 13);
-    adicionarArvoreBMais(&arv, 7);
-    adicionarArvoreBMais(&arv, 16);
-    adicionarArvoreBMais(&arv, 17); */
+    fscanf(entrada, "%c", &comando);
     
-    //removerArvoreBMais(&arv, 20);
-    //removerArvoreBMais(&arv, 9);
-    //removerArvoreBMais(&arv, 10);
+    while (comando != 'f') {
 
-    //removerArvoreBMais(&arv, 25);
+        switch (comando) {
+            case 'p':
+                mostrar(&arv);
+                break;
+            
+            case 'i':
+                fscanf(entrada, "%d\n", &registro);
+                //printf("Adicionar o registro: %d\n", registro);
+                adicionarArvoreBMais(&arv, registro);
+                break;
 
-    //adicionarArvoreBMais(&arv, 12);
-    //adicionarArvoreBMais(&arv, 40);
+            case 'r':
+                fscanf(entrada, "%d\n", &registro);
+                //printf("Remover o registro: %d\n", registro);
+                removerArvoreBMais(&arv, registro);
+                break;
+            
+            default:
+                break;
+        }
+        fscanf(entrada, "%c\n", &comando);
+
+    }
 
     //mostrar(&arv);
     //printf("\n");
     //mostrarDetalhes(arv.raiz);
 
-    int qnt = contarRegistros(&arv);
+    //int qnt = contarRegistros(&arv);
 
-    printf("A arvore tem: %d registros\n", qnt);
+    //printf("A arvore tem: %d registros\n", qnt);
 
 
 
