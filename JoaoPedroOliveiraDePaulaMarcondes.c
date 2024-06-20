@@ -312,8 +312,7 @@ void removerArv(NO* p, int registro) {
     while (registro >= p->chave[i] && i < p->numChaves) {
         i++;
     }
-    removerArv(p->filhos[i], registro);
-    p->chave[i-1] = minimoFilhoEsquerdo(p->filhos[i]);
+    
     NO* filho = p->filhos[i];
     if (filho->numChaves < t) {
         if (i > 0) {
@@ -324,7 +323,13 @@ void removerArv(NO* p, int registro) {
                 trocarChaveFilhoEsquerdo(p, filho_esquerda, filho, i-1);
             }
         }
+
+        removerArv(p, registro);
+        return;
     }
+    removerArv(p->filhos[i], registro);
+    p->chave[i-1] = minimoFilhoEsquerdo(p->filhos[i]);
+
 }
 
 void removerArvoreBMais(ArvoreBMais* arv, int registro) {
