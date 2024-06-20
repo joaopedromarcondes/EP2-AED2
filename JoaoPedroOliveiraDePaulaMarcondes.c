@@ -302,6 +302,25 @@ void trocarChaveFilhoEsquerdo(NO* pai, NO* filho_esquerdo, NO* filho, int i) {
     pai->chave[i] = filho->chave[0];
 }
 
+void trocarChaveFilhoDireito(NO* pai, NO* filho, NO* filho_direito, int i) {
+
+    filho->chave[filho->numChaves] = filho_direito->chave[0];
+    filho->filhos[filho->numChaves+1] = filho_direito->filhos[0];
+    filho->numChaves++;
+    int a;
+    for (a = 0; a < filho_direito->numChaves; a++) {
+        filho_direito->chave[a] = filho_direito->chave[a+1];
+        filho_direito->filhos[a] = filho_direito->filhos[a+1];
+    }
+
+    filho_direito->chave[filho_direito->numChaves-1] = -1;
+    filho_direito->numChaves--;
+
+    filho_direito->filhos[filho_direito->numChaves] = NULL;
+
+    pai->chave[i] = filho_direito->chave[0];
+}
+
 void removerArv(NO* p, int registro) {
     if (p->folha) {
         removerNoFolha(p, registro);
@@ -321,6 +340,13 @@ void removerArv(NO* p, int registro) {
                 merge(p, filho_esquerda, filho, i-1);
             } else {
                 trocarChaveFilhoEsquerdo(p, filho_esquerda, filho, i-1);
+            }
+        } else {
+            NO* filho_direita = p->filhos[i+1];
+            if (filho_direita->numChaves < t) {
+                merge(p, filho, filho_direita, i);
+            } else {
+                trocarChaveFilhoDireito(p, filho, filho_direita, i);
             }
         }
 
