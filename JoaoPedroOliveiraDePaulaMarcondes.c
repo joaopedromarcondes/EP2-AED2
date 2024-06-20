@@ -269,7 +269,7 @@ void merge(NO* pai, NO* p, NO* q, int i) {
     p->numChaves += q->numChaves;
     p->filhos[2*t-1] = q->filhos[2*t-1];
 
-    //free(q);
+    free(q);
 
     // arruma pai
     int c;
@@ -413,7 +413,7 @@ int main() {
 
     //mostrar(&arv);
     //printf("\n");
-    //mostrarDetalhes(arv.raiz);
+    mostrarDetalhes(arv.raiz);
 
     //int qnt = contarRegistros(&arv);
 
