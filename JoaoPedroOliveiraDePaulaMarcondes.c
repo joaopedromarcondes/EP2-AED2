@@ -284,6 +284,24 @@ void merge(NO* pai, NO* p, NO* q, int i) {
     pai->chave[i-1] = minimoFilhoEsquerdo(pai->filhos[i]);
 }
 
+void trocarChaveFilhoEsquerdo(NO* pai, NO* filho_esquerdo, NO* filho, int i) {
+    int a;
+    for (a = filho->numChaves; a > 0; a--) {
+        filho->chave[a] = filho->chave[a-1];
+        filho->filhos[a+1] = filho->filhos[a];
+    }
+    filho->numChaves++;
+
+    filho->chave[0] = filho_esquerdo->chave[filho_esquerdo->numChaves-1];
+    filho_esquerdo->chave[filho_esquerdo->numChaves-1] = -1;
+    filho_esquerdo->numChaves--;
+
+    filho->filhos[0] = filho_esquerdo->filhos[filho_esquerdo->numChaves];
+    filho_esquerdo->filhos[filho_esquerdo->numChaves] = NULL;
+
+    pai->chave[i] = filho->chave[0];
+}
+
 void removerArv(NO* p, int registro) {
     if (p->folha) {
         removerNoFolha(p, registro);
@@ -303,7 +321,7 @@ void removerArv(NO* p, int registro) {
             if (filho_esquerda->numChaves < t) {
                 merge(p, filho_esquerda, filho, i-1);
             } else {
-                // pegar a chave do lado
+                trocarChaveFilhoEsquerdo(p, filho_esquerda, filho, i-1);
             }
         }
     }
@@ -329,7 +347,7 @@ int main() {
     ArvoreBMais arv;
     inicializarArvoreBMais(&arv);
 
-    FILE* entrada = fopen("entrada.txt", "r");
+    FILE* entrada = fopen("entrada_teste.txt", "r");
 
     char comando;
     int registro;
