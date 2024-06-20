@@ -221,11 +221,13 @@ void insereArvoreBMais(NO* p, int registro) {
     while (registro > p->chave[pos] && pos < p->numChaves) {
         pos++;
     }
-    //printf("registro: %d, pos: %d\n", registro, p->folha);
-    insereArvoreBMais(p->filhos[pos], registro);
+
     if (p->filhos[pos]->numChaves == 2*t-1) {
         split(p, p->filhos[pos], pos);
-    }
+        insereArvoreBMais(p, registro);
+    } else {
+        insereArvoreBMais(p->filhos[pos], registro);
+    }   
 }
 
 
