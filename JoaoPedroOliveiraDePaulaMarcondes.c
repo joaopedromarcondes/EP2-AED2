@@ -16,36 +16,36 @@ typedef struct {
 NO* raiz;
 } ArvoreBMais;
 
-void mostrarArvoreBMais(NO* p, int i) {
+void mostrarArvoreBMais(NO* p, int i, FILE* saida) {
     
     if (!p->folha) {
-        printf("(");
-        mostrarArvoreBMais(p->filhos[i], 0);
-        printf(") ");
+        fprintf(saida, "(");
+        mostrarArvoreBMais(p->filhos[i], 0, saida);
+        fprintf(saida, ") ");
     }
     
-    printf("%d", p->chave[i]);
+    fprintf(saida, "%d", p->chave[i]);
     if (i + 1 < p->numChaves) {
-        printf(" ");
-        mostrarArvoreBMais(p, i+1);
+        fprintf(saida, " ");
+        mostrarArvoreBMais(p, i+1, saida);
     }  else {
         if (!p->folha) {
-            printf(" (");
-            mostrarArvoreBMais(p->filhos[i+1], 0);
-            printf(")");
+            fprintf(saida, " (");
+            mostrarArvoreBMais(p->filhos[i+1], 0, saida);
+            fprintf(saida, ")");
         }
     }
 
 }
 
-void mostrar(ArvoreBMais* arv) {
+void mostrar(ArvoreBMais* arv, FILE* saida) {
     if (arv->raiz->numChaves == 0) {
-        printf("Vazia\n");
+        fprintf(saida, "Vazia\n");
         return;
     }
-    printf("(");
-    mostrarArvoreBMais(arv->raiz, 0);
-    printf(")\n");
+    fprintf(saida, "(");
+    mostrarArvoreBMais(arv->raiz, 0, saida);
+    fprintf(saida, ")\n");
 }
 
 void mostrarDetalhes(NO* p) {
@@ -240,7 +240,6 @@ void adicionarArvoreBMais(ArvoreBMais* arv, int registro) {
         arv->raiz->folha = false;
         p = arv->raiz;
     }
-    //printf("%d\n", p->chave[0]);
     insereArvoreBMais(p, registro);
 }
 
@@ -372,13 +371,23 @@ void removerArvoreBMais(ArvoreBMais* arv, int registro) {
 
 
 
-int main() {
+int main(int argc, char *argv[]) {
+
+    if (argc != 3) {
+        fprintf(stderr, "Erro. Passe dois argumentos como parametro. Ex: ./a.out entrada.txt saida.txt");
+        return 1;
+    }
 
 
     ArvoreBMais arv;
     inicializarArvoreBMais(&arv);
 
-    FILE* entrada = fopen("entrada_teste.txt", "r");
+    FILE* entrada = fopen(argv[1], "r");
+    FILE* saida = fopen(argv[2], "w");
+
+    if (!saida || !entrada) {
+        fprintf(stderr, "Erro na abertura de algum dos arquivos.");
+    }
 
     char comando;
     int registro;
@@ -389,7 +398,7 @@ int main() {
 
         switch (comando) {
             case 'p':
-                mostrar(&arv);
+                mostrar(&arv, saida);
                 break;
             
             case 'i':
@@ -410,15 +419,6 @@ int main() {
         fscanf(entrada, "%c\n", &comando);
 
     }
-
-    //mostrar(&arv);
-    //printf("\n");
-    mostrarDetalhes(arv.raiz);
-
-    //int qnt = contarRegistros(&arv);
-
-    //printf("A arvore tem: %d registros\n", qnt);
-
 
 
     return 0;
